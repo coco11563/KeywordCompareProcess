@@ -37,12 +37,12 @@ object keywordXLSProcess {
       file_sb.delete()
       val FOS = new FileOutputStream(file)
       val subFOS = new FileOutputStream(file_sb)
-      val sheet = wb.createSheet(s"${code}")
-      val sheet_sub = wb_sub.createSheet(s"${code}")
+      val sheet = wb.createSheet(s"$code")
+      val sheet_sub = wb_sub.createSheet(s"$code")
       val schemaRow = sheet.createRow(0)
       val schemaRow_sub = sheet_sub.createRow(0)
       initApplicationSchema(schemaRow)
-      initApplicationSchema(schemaRow_sub)
+      initApplicationSubSchema(schemaRow_sub)
       var index = 1
       var index_sub = 1
       val sql = s"select * from m_${year}_keyword_recommend_with_bias where applyid like '${code}%'"
@@ -59,7 +59,7 @@ object keywordXLSProcess {
         val weight = rs.getString("学部下关键词中出现频次")
         val title_f = rs.getString("研究方向下关键词中出现频次")
         val flag = rs.getString("是否需要补充到上级")
-        if (flag == "0") {
+        if (flag != "-1") {
           val row = sheet.createRow(index)
           row.createCell(0).setCellValue(applyid)
           row.createCell(1).setCellValue(research_field)
@@ -73,13 +73,13 @@ object keywordXLSProcess {
         } else {
           val row = sheet_sub.createRow(index_sub)
           row.createCell(0).setCellValue(applyid)
-          row.createCell(1).setCellValue(research_field)
-          row.createCell(2).setCellValue(keyword)
-          row.createCell(3).setCellValue(status)
-          row.createCell(4).setCellValue(count)
-          row.createCell(5).setCellValue(percentage)
-          row.createCell(6).setCellValue(weight)
-          row.createCell(7).setCellValue(title_f)
+//          row.createCell(1).setCellValue(research_field)
+          row.createCell(1).setCellValue(keyword)
+          row.createCell(2).setCellValue(status)
+          row.createCell(3).setCellValue(count)
+          row.createCell(4).setCellValue(percentage)
+          row.createCell(5).setCellValue(weight)
+          row.createCell(6).setCellValue(title_f)
           index_sub += 1
         }
 
@@ -101,5 +101,13 @@ object keywordXLSProcess {
     row.createCell(6).setCellValue("学部下填作申请书关键词频次")
     row.createCell(7).setCellValue("研究方向下填作申请书关键词频次")
   }
-
+  def initApplicationSubSchema (row : Row) : Unit = {
+    row.createCell(0).setCellValue("末级代码")
+    row.createCell(1).setCellValue("关键词")
+    row.createCell(2).setCellValue("是否新词")
+    row.createCell(3).setCellValue("学部下总频次（标题+摘要+关键词）")
+    row.createCell(4).setCellValue("研究方向下总频次（标题+摘要+关键词）")
+    row.createCell(5).setCellValue("学部下填作申请书关键词频次")
+    row.createCell(6).setCellValue("研究方向下填作申请书关键词频次")
+  }
 }
